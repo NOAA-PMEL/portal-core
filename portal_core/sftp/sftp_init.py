@@ -4,40 +4,56 @@ import paramiko
 
 from paramiko.pkey import base64
 
-server = "sftp.pmel.noaa.gov"
-username = "ncei_sftp"
-# path_to_ssh = os.path.join("/Users/kamb", ".ssh")
-# path_to_hosts_file = os.path.join(path_to_ssh, "known_hosts")
-# path_to_pkey_file = os.path.join(path_to_ssh, "ncei-key-rsa")
+SERVER = "sftp.pmel.noaa.gov"
+USERNAME = "ncei_sftp"
 
-#
+_ssh = None
 
-key_guts = os.environ.get("NCEI_SFTP_KEY")
-host_key = os.environ.get("SFTP_HOST_KEY")
+def get_ssh():
+    """
+    Connect to the NCEI SFTP server, once per process.
 
-key_string = f"""\
------BEGIN OPENSSH PRIVATE KEY----- 
-{key_guts}
- -----END OPENSSH PRIVATE KEY-----
-"""
+    Deliberately not done at import: base is a libary, and importing must
+    not require credentials or reach the network.
+    """
+    global _ssh
+    if _ssh is not None:
+        return _ssh
 
-pkey = paramiko.Ed25519Key.from_private_key(io.StringIO(key_string))
-ssh = paramiko.SSHClient()
+    key_guts = os.environ.get("NCEI_SFTP_KEY")
+    host_key = os.environ.get("SFTP_HOST_KEY")
+    if not key_guts or not host_key:
+        raise RuntimeError(
+            "NCEI_SFTP_KEY and SFTP_HOST_KEY must be set to use SFTP transfer."
+        )
 
-key_type, key_data = host_key.split(maxsplit=1)
-keyObj = paramiko.PKey.from_type_string(key_type, base64.decodebytes(key_data.encode()))
+    key_string = f"""\
+    -----BEGIN OPENSSH PRIVATE KEY----- 
+    {key_guts}
+    -----END OPENSSH PRIVATE KEY-----
+    """
 
-# add to host keys
-ssh.get_host_keys().add(hostname=server, keytype=key_type, key=keyObj)
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    pkey = paramiko.Ed25519Key.from_private_key(io.StringIO(key_string))
+    ssh = paramiko.SSHClient()
 
-try:
+    key_type, key_data = host_key.split(maxsplit=1)
+    keyObj = paramiko.PKey.from_type_string(key_type, base64.decodebytes(key_data.encode()))
+
+    # add to host keys
+    ssh.get_host_keys().add(
+        hostname=SERVER, 
+        keytype=key_type, 
+        key=keyObj
+        )
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
     ssh.connect(
-        server,
-        username=username,
+        SERVER,
+        username=USERNAME,
         pkey=pkey,
         look_for_keys=False,
         disabled_algorithms={"pubkeys": ["rsa-sha2-512", "rsa-sha2-256"]},
     )
-except:
-    print("STFP server appears to be down!!!")
+
+    _ssh = ssh
+    return _ssh

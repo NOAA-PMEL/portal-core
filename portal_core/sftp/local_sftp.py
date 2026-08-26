@@ -23,7 +23,7 @@ def mkdir_p(sftp, remote_directory):
 
 def send_bag(bag, dashboard_user, data_submitter, submission_id):
     full_bag = os.path.abspath(bag)
-    sftp = sftp_init.ssh.open_sftp()
+    sftp = sftp_init.get_ssh().open_sftp()
     bag_name = os.path.basename(bag)
     remote_path = os.path.join("/data/data_submit", dashboard_user, data_submitter, str(submission_id))
     p = mkdir_p(sftp, remote_path)
@@ -43,7 +43,7 @@ def send_bag(bag, dashboard_user, data_submitter, submission_id):
 
 
 def put(in_file, out_file):
-    sftp = sftp_init.ssh.open_sftp()
+    sftp = sftp_init.get_ssh().open_sftp()
     try:
         sftp.put(in_file, out_file) # At this point, you are in remote_path
     except Exception as e:
