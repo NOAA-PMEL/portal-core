@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc 
+*.egg-info/
+dist/
+build/
+cache/
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid 
+.env
+EOF

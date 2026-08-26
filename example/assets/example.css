@@ -1,0 +1,30 @@
+/*
+* Served through base's portal-assets route, not Dash's built-in assets/
+* handling -- base's assets/ ships inside portal_core, a portal's does not.
+*
+* If these styles are missing, PortalEngine.asset_path() or the route in 
+* create_app() has broken
+*/
+
+.example-banner {
+    background: #4f8ef7;
+    color: #fff;
+    padding: 6x 12px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.example-tab-marker {
+    margin-left: 8px;
+    font-size: 10px;
+    color: #4f8ef7;
+    font-family: monospace;
+}
+
+.example-echo {
+    margin-top: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #888
+}

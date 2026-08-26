@@ -1,0 +1,4 @@
+postgresql-client
+postgresql-client-common
+libpq-dev
+unzip

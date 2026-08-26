@@ -1,0 +1,64 @@
+# Dash app instance specific Configuration
+# Customize these values for your organization
+
+# ====================================================================================
+# BRANDING & APPEARANCE
+# ====================================================================================
+branding:
+  organization_name: "Pacific Marine Environmental Laboratory"
+  organization_short_name: "PMEL"
+  
+  page_title: "Example Scientific Data Information System"
+  version: "v0.0.3"
+
+  # Logo paths, served fro ocean_sites/assets
+  header_logo: "NOAA-OAP-Logo-reverse.svg"
+  footer_logo: "NOAA-OAP-Logo-reverse.svg"
+
+# ====================================================================================
+# CONTACT INFORMATION
+# ====================================================================================
+contact:
+  email: "oar.pmel.webmaster@noaa.gov"
+  footer_links:
+    organization:
+      text: "Pacific Marine Environmental Laboratory"
+      url: "https://www.pmel.noaa.gov/"
+    parent_org:
+      text: "National Oceanic and Atmospheric Administration"
+      url: "https://www.noaa.gov/"
+
+    legal_links:
+      - text: "DOC"
+        url: "https://www.commerce.gov/"
+      - text: "NOAA"
+        url: "https://www.noaa.gov/"
+      - text: "OAR"
+        url: "https://www.research.noaa.gov/"
+      - text: "PMEL"
+        url: "https://www.pmel.noaa.gov/"
+      - text: "Privacy Policy"
+        url: "https://www.noaa.gov/disclaimer"
+      - text: "Disclaimer"
+        url: "https://www.noaa.gov/disclaimer"
+      - text: "Accessibility"
+        url: "https://www.pmel.noaa.gov/accessibility"
+
+# ====================================================================================
+# Data File specification(s)
+# ====================================================================================
+# Ocean sites
+allow_multiple_data_files_to_submit: False # should be True/False
+
+# # ====================================================================================
+# SUBMISSION ARCHIVES
+# ====================================================================================
+submission_archives: # The options for where data can be submitted to (will get fed into the agGrid.js file in assets)
+  - key: ncei
+    icon: '🏛️' 
+    label: 'NCEI'
+    enabled: true 
+  - key: obis
+    icon: '🔬' 
+    label: 'OBIS'
+    enabled: false # enabled=false will grey out in drop down menu - can tell user that it is coming soon.

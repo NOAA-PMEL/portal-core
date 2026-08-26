@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "portal-core"
+version = "0.1.0"
+description = "Shared base for PMEL data submission portals"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    # Dash / web
+    "dash",
+    "dash-ag-grid",
+    "dash-design-kit",
+    "flask",
+    "flask-sqlalchemy",
+    "flask-wtf",
+
+    # Data layer
+    "sqlalchemy",
+    "psycopg2-binary",
+
+    # Background jobs
+    "celery",
+    "redis",
+    "diskcache",
+
+    # Science / data handling
+    "pandas",
+    "numpy",
+    "plotly",
+    "xarray",
+    "cf-xarray",
+    "netCDF4",
+
+    # Misc.
+    "pydantic",
+    "pyyaml",
+    "paramiko",
+    "bagit",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "pytest"
+]
+
+# Creates a real terminal command. On install, pip generates a small executable
+# named portal-seed on the PATH that import portal_core.seed.ror_and_roles
+# and calls its main() function (which has an arg). E.g. command:
+# portal-seed --ror-csv /path/to/ror-data.csv
+[project.scripts]
+portal-seed = "portal_core.seed.ror_and_roles:main"
+
+# -----------------------------------------------------------------------------
+# Packaging
+# -----------------------------------------------------------------------------
+# Which directories become part of the installed package. where means
+# start looking in the repo root; include filters to portal_core and 
+# anything beneath it.
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["portal_core*"]
+
+# Need to double check this - by default setuptools ships only .py files - this
+# hopefully grabs all the other files in assets that aren't .py
+# Will hopeuflly recursively grab files inside subdirectories in assets/ as well
+# as all files.
+[tool.setuptools.package-data]
+portal_core = ["assets/**/*", "assets/*"]

@@ -1,0 +1,55 @@
+.rj {
+    float: right;
+    text-align: justify;
+    direction:rtl;
+}
+.makewhite * {
+    color: white !important;
+}
+
+/* TURN ORCID LINK BLUE ON HOVER START */
+/* .orcid-link, 
+.orcid-link:visited, 
+.orcid-link:active {
+    color: #555 !important;
+    text-decoration: none !important;
+}
+
+/* Target the link ONLY on hover */
+/* .orcid-link:hover {
+    color: #4f8ef7 !important;
+    text-decoration: underline !important;
+} */
+/* TRUN ORCID LINK BLUE ON HOVER END */
+
+
+/* Tooltip over the dot hover for fields changed
+.nc-field-dot:hover .nc-field-tooltip {
+    display: block !important;
+}
+
+/* For metadata validation */
+/* .nc-field-err:empty { display: none; }
+
+.nc-field-wrap.is-error input,
+.nc-field-wrap.is-error .Select-control {
+    border-color: rgba(255, 77, 77, 0.7) !important;
+    background-color: rgba(42, 18, 21, 0.3) !important; /* Semi-translucent dark crimson */
+/* }
+.nc-field-wrap.is-warning input,
+.nc-field-wrap.is-warning .Select-control {
+    border-color: rgba(247, 180, 79, .55) !important;
+    background-color: rgba(247, 180, 79, .04) !important;
+}
+
+.metadata-save-status:not(:empty) { padding-bottom: 12px !important; } */ 
+
+/* For metadata validation - variables err */
+/* .nc-var-card.has-errors {
+    border-color: rgba(255, 77, 77, 0.5) !important;
+    box-shadow: 0 0 4px rgba(255, 77, 77, 0.15);
+} */
+
+/* .nc-var-card.has-errors .nc-var-card-hd {
+    background-color: rgba(42, 18, 21, 0.4) !important; /* Dark crimson header block tint */
+/* } */
