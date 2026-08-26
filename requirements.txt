@@ -1,0 +1,2 @@
+--extra-index-url=https://dash-temp.pmel.noaa.gov/Docs/packages
+-e .[dev] # points to the dependencies defined in pyproject.toml

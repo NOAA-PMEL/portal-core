@@ -27,8 +27,11 @@ portal-core/
 │   ├── assets/
 │   └── ...
 ├── example/              # the test portal — does NOT ship
-├── pyproject.toml
-└── README.md
+├── pyproject.toml        # dependencies and packaging (the real list)
+├── requirements.txt      # two lines; points at pyproject.toml for DE
+├── README.md             # for portal developers
+├── MAINTAINING_PORTAL_CORE.md
+└── CHANGELOG.md
 ```
 
 `example/` is excluded from the built package by `include = ["portal_core*"]` in `pyproject.toml`. It exists only so base has something to run against.
@@ -36,6 +39,15 @@ portal-core/
 ---
 
 ## Prerequisites
+
+A workspace provisions itself from `requirements.txt`, which does an editable
+install of this project. After a workspace rebuild you should not need to run
+`pip install` by hand -- check with:
+
+  `cd /tmp && python -c "import portal_core; print(portal_core.__file__)"`
+
+That should print a path inside your repo. If it fails, run
+`pip install -e ".[dev]"` from the repo root.
 
 Base needs Postgres and Redis attached. First run on a fresh database:
 
@@ -96,6 +108,40 @@ pip install -e . --no-deps
 ```
 
 Needed after: adding/removing a dependency, bumping `version`, changing a `[project.scripts]` entry, changing `package-data` or `packages.find`, or adding a new top-level directory under `portal_core/`.
+
+**If you added or removed a dependency, drop `--no-deps`:**
+
+```bash
+pip install -e ".[dev]"
+```
+
+`--no-deps` skips dependency resolution, which is faster and can't disturb a 
+working environment - but it also means a newly added dependency never gets
+installed.
+
+A workspace rebuild reinstalls automatically via `requirements.txt`, so this is 
+mainly for changes you make mid-session.
+
+---
+
+## Deploying the example portal
+
+`example/` deploys as a live reference - a URL where anyone can see what a 
+minimal portal looks like, and a canary that catches breakage without a portal 
+team having to report it. 
+
+`Procfile`:
+
+```
+web: gunicorn example.app:server --workers 2
+workers: celery -A portal_core.app_factory:celery_app worker --loglevel DEBUG --concurrency=2
+worker-beat: celery -A portal_core.app_factory:celery_app beat
+```
+
+Deploying pushes the whole repo, so `example/` being excluded from teh built
+wheel does not affect it.
+
+This is the only thing in this repo that deploys. Base itself is a library.
 
 ---
 
