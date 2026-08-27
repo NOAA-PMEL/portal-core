@@ -11,7 +11,7 @@ A **portal** is a Dash application where researchers upload data files and descr
 
 ---
 
-## The shape of a portal
+## The shape of a portal / Your portal's `app.py` file
 
 Base never imports your portal. It receives a `PortalEngine` instance and a config file path, and everything else follows from those two.
 
@@ -68,7 +68,7 @@ my-portal/
 └── utils/                     # your own helpers
 ```
 
-`example/` in the base repo is a working minimal portal. Copy it.
+`example/` in the base repo is a working minimal portal. Copy it's structure.
 
 ### 3. Write the engine
 
@@ -85,21 +85,97 @@ class Engine(PortalEngine):
         ]
 ```
 
-That is a complete, working portal engine. Every other hook has a default that does nothing.
+That is a complete, working portal engine. Every other hook has a default that does nothing. Can optionally add these hooks. See below.
 
-### 4. Run
+### 4. Dash Enterprise setup
+
+Do this once, in teh Dash Enterprise UI, **before teh frist deploy**. 
+
+#### Services
+
+Under the app's **Services** tab, enable both:
+
+| Service | Why |
+|---|---|
+| **Postgres** | Every table in [Extending the schema](#extending-the-schema). `portal_core.constants.postgres_engine` reads its connection string from teh environment at import.|
+| **Redis** | Celery broker for the `workers` and `worker-beat` processes in the `Procfile`. Without it the web process starts but background work silently never runs. | 
+
+Enabling each service injects its connection string as an environment variable
+(typically `DATABASE_URL` and `REDIS_URL`). You do not set these by hand.
+
+#### Persistent file storage
+
+Under the **Persistent Filesystem**, enable **persistent filesystem** and note the mount path.
+
+As of 8/27/2026 (before file uploading workflow has been implemented), uploaded data files, archives, bags, and tarballs are written to real directories on disk - `UPLOAD_DIRECTORY`, `ARCHIVE_DIRECOTRY`, `BAG_DIRECTORY`, `TAR_DIRECTORY` in `portal_core.constants`. Without a mounted volume these files won't persist and save. Pleas note after enabling persisten filesystem, you will have to create the directories in `mount/` to save to in the environment (e.g. `../mount/submission/`).
+
+Point the four directory bariables at paths under mount.
+
+#### Environment variables
+
+Under the **Settings -> Environment Variables**, add everything the app reads via `os.environ.get()`. A missing variable surfaces as a startup crash or connection string, not a clear error message.
+
+| Variable | Set by | Notes |
+|---|---|---|
+| `DATABASE_URL` | Dash Enterprise | Created when you enable Postgres |
+| `REDIS_URL | Dash Enterprise | Created when you enable Redis |
+| `UPLOAD_DIRECTORY | You | Path under the persistent mount |
+| `ARCHIVE_DIRECTORY | You | Path under the persistent mount |
+| `BAG_DIRECTORY | You | Path under the persistent mount |
+| `TAR_DIRECTORY` | You | Path under the persistent mount |
+| `NCEI_<keys> | You | **TODO** Will need to be implemented when this submission feature is implemented (see sftp folder) |
+
+Never commit these values. Keys, passwords, paths should be saved as environment variables.
+
+---
+
+### 5. Database setup
+
+Base needs Postgres and Redis attached, and persistent file storage enabled - see
+[Dash Enterprise setup](#dash-enterprise-setup). Do that first; the steps below
+assyne the services exist and teh environment variables are set.
+
+#### 1. Stage the ROR reference CSV
+
+The seed step reads a Research Organization Registry CSV and will not download it
+for you. (Can get the ror-csv from the portal-core mount directory). Save it somewhere under teh persistent mount **before** running the seed
+command, so the path stays valid between deploys and terminal sessions:
 
 ```bash
-python -m my_portal.app     # from the repo root, NOT python my_portal/app.py
+mkdir ~/mount/ror
+cp ror-data.csv ~/mount/ror/ror-data.csv
 ```
 
-The path form puts the wrong directory on Python's search path and base won't be found.
+#### 2. Create tables
+
+Base's tables plus yours, via `load_models()`:
+
+```bash
+# 1. Create tables -- base's plus yours, via load_models()
+python -m my_portal.app      # then Ctrl-C
+```
+
+#### 3. Seed shared reference data
+
+```bash
+portal-seed --ror-csv /path/to/ror-data.csv
+```
+
+This populates `research_organization` and the `metadata_role` rows.
+
+#### 4. Run
+
+```bash
+python -m my_portal.app
+```
+
+The first run logs an error from `_load_metadata_roles()` because the "Data Submitter" and "Investigator" roles don't exist yet. Expected; it goes away after seeding.
 
 ---
 
 ## Conventions
 
-Base finds your code by name. Get these right and nothing needs registering.
+Base finds your code by name. Get these right and nothing needs registering in the engine.py.
 
 | What | Where | Must define |
 |---|---|---|
@@ -248,6 +324,7 @@ Base uses these with `ALL` selectors. **Do not reuse these `type` values** — y
 ### Writing a save callback
 
 ```python
+from portal_core.utils import get_or_create_oads_metadata_id
 @app.callback(
     Output('notifications', 'children', allow_duplicate=True),
     Output('metadata-modal-overlay', 'style', allow_duplicate=True),
@@ -260,6 +337,9 @@ Base uses these with `ALL` selectors. **Do not reuse these `type` values** — y
 )
 def save_metadata(n_clicks, submission_id, ...):
     ...
+    # Almost every save callback will start iwth get_or_create_oads_metadata_id from portal_core.utils.
+    oads_id = get_or_create_oads_metadata_id(session=session, submission_id=submission_id)
+
     return message, {'display': 'none'}, _PANEL_CLOSED, _OVERLAY_HIDDEN
 ```
 
@@ -292,7 +372,6 @@ from portal_core.utils import (
 ```python
 from portal_core.constants import (
     postgres_engine,
-    UPLOAD_DIRECTORY, ARCHIVE_DIRECTORY, BAG_DIRECTORY, TAR_DIRECTORY,
     _OVERLAY_HIDDEN, _OVERLAY_VISIBLE,
     _PANEL_OPEN, _PANEL_CLOSED,
     VISIBLE_BLOCK, HIDDEN_BLOCK,
@@ -439,26 +518,6 @@ submission_archives:
 ```
 
 All keys are required except `submission_archives`. A missing key raises `KeyError` at startup.
-
----
-
-## Database setup
-
-Base needs Postgres and Redis attached.
-
-```bash
-# 1. Create tables -- base's plus yours, via load_models()
-python -m my_portal.app      # then Ctrl-C
-
-# 2. Seed shared reference data
-portal-seed --ror-csv /path/to/ror-data.csv
-# or: python -m portal_core.seed.ror_and_roles --ror-csv /path/to/ror-data.csv
-
-# 3. Run
-python -m my_portal.app
-```
-
-The first run logs an error from `_load_metadata_roles()` because the "Data Submitter" and "Investigator" roles don't exist yet. Expected; it goes away after seeding.
 
 ---
 
