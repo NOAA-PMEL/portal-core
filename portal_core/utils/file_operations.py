@@ -8,10 +8,8 @@ import base64
 from datetime import datetime
 from pathlib import Path
 
-from portal_core.constants import (
-    UPLOAD_DIRECTORY,
-    ARCHIVE_DIRECTORY
-)
+UPLOAD_DIRECTORY = os.environ.get("UPLOAD_DIRECTORY")
+ARCHIVE_DIRECTORY = os.environ.get("ARCHIVE_DIRECTORY")
 
 # Helper function to compute hash
 # https://stackoverflow.com/questions/22058048/hashing-a-file-in-python
@@ -31,7 +29,7 @@ def archive_file(file_name, dashboard_user, sid):
         str(sid),
         file_name + "." + datetime.now().isoformat(),
     )
-    Path(os.path.join(ARCHIVE_DIRECTORY, str(sid))).mkdir(
+    Path(ARCHIVE_DIRECTORY, str(sid)).mkdir(
         parents=True, exist_ok=True
     )
     shutil.move(to_move, destination)

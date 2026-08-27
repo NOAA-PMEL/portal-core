@@ -26,6 +26,8 @@ dependencies = [
     "celery",
     "redis",
     "diskcache",
+    "multiprocess",
+    "psutil",
 
     # Science / data handling
     "pandas",

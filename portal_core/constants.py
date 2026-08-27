@@ -4,11 +4,17 @@ from sqlalchemy import create_engine
 
 VISIBLE_BLOCK = {"display": ""}
 HIDDEN_BLOCK = {"display": "none"}
-UPLOAD_DIRECTORY = "../mount/submissions"
-ARCHIVE_DIRECTORY = "../mount/archive"
-BAG_DIRECTORY = "../mount/bags"
-TAR_DIRECTORY = "../mount/tar"
-# VERSION = "v0.0.3" # added in the instance_config.yaml file
+
+# Deployments MUST set these to in Dash's environment variables on a persistent volume
+for directory in ["UPLOAD_DIRECTORY", "ARCHIVE_DIRECTORY", "BAG_DIRECTORY", "TAR_DIRECTORY"]:
+    if directory not in os.environ:
+        from portal_core.utils.logger import app_logger as log
+        log.error(f"{directory} not set. Must set directory in Dash's environment.")
+
+UPLOAD_DIRECTORY = os.environ.get("UPLOAD_DIRECTORY")
+ARCHIVE_DIRECTORY = os.environ.get("ARCHIVE_DIRECTORY")
+BAG_DIRECTORY = os.environ.get("BAG_DIRECTORY")
+TAR_DIRECTORY = os.environ.get("TAR_DIRECTORY")
 
 submissions_table = "submission"
 files_table = "file"
