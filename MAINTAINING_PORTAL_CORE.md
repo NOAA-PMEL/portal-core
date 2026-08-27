@@ -1,6 +1,7 @@
 # Maintaining `portal-core`
 
-This repo is a **library**. Nothing here is deployed. Portals install it and extend it.
+The folder inside this repo called `portal_core` is a **library**. Nothing here is deployed. Portals install it and extend it.
+The folder `example/` in this repo is deployed as a test ground for any updates to base/portal-core.
 
 If you are looking for how to build a portal *on top of* this, see `README.md`. This document is for changing base itself.
 
@@ -149,7 +150,7 @@ This is the only thing in this repo that deploys. Base itself is a library.
 
 ```bash
 # 1. Base must not import a portal
-grep -rnE "^(from|import) (arctic|ocean_sites)" portal_core/
+grep -rnE "^(from|import) (example)" portal_core/
 
 # 2. Nothing computes a path by walking OUT of its own folder
 grep -rn "parents\[" portal_core/
