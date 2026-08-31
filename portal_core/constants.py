@@ -1,5 +1,6 @@
 import os
 import redis
+import logging
 from sqlalchemy import create_engine
 
 VISIBLE_BLOCK = {"display": ""}
@@ -8,8 +9,8 @@ HIDDEN_BLOCK = {"display": "none"}
 # Deployments MUST set these to in Dash's environment variables on a persistent volume
 for directory in ["UPLOAD_DIRECTORY", "ARCHIVE_DIRECTORY", "BAG_DIRECTORY", "TAR_DIRECTORY"]:
     if directory not in os.environ:
-        from portal_core.utils.logger import app_logger as log
-        log.error(f"{directory} not set. Must set directory in Dash's environment.")
+        logging.getLogger(__name__).error(
+            f"{directory} not set. Must set directory in Dash's environment.")
 
 UPLOAD_DIRECTORY = os.environ.get("UPLOAD_DIRECTORY")
 ARCHIVE_DIRECTORY = os.environ.get("ARCHIVE_DIRECTORY")

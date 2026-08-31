@@ -49,3 +49,9 @@ add this after split.
 - Circular import in `portal-core/utils/clone_submission.py`, which imported
 from the `portal_core.utils` package while that package's `__init__.py` was 
 still executing. Now imports the sibling modules directly.
+
+## v0.1.2 - 2026-08-31
+
+### Fixed
+- Circular import in in `portal_core.submission_db_utils.py` by removing the import in 
+`portal_core.constants` from `portal_core.utils` and installing `logger` directly.
