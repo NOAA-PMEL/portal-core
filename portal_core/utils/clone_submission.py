@@ -7,10 +7,8 @@ from portal_core.models import (
 )
 from portal_core.constants import postgres_engine
 from sqlalchemy.orm import Session
-from portal_core.utils import (
-    create_submission_id,
-    app_logger as log
-)
+from portal_core.utils.identifer_utils import create_submission_id
+from portal_core.utils.logger import app_logger as log
 
 def clone_submission(original_submission_id: str, dashboard_user_id: int, portal):
     """
