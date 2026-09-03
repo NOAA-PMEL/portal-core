@@ -37,35 +37,41 @@ Everything else your portal contributes is found **by convention** — base disc
 ### 1. Install base
 
 ```
-portal-core @ git+ssh://git@github.com/<org>/portal-core.git@v0.0.3
+portal-core @ git+https://git@github.com/<org>/portal-core.git@v0.0.3 # or whichever tag `portal-core` is on.
 ```
 
 in your portal's `requirements.txt`, then:
 
 ```bash
-pip install -r requirements.txt --extra-index-url=https://dash-temp.pmel.noaa.gov/Docs/packages
+pip install -r requirements.txt
 ```
 
-The extra index is needed for `dash-design-kit`. Always pin a tag — see [Versioning](#versioning).
+The extra index inside `requirements.txt` is needed for `dash-design-kit`. Always pin a tag — see [Versioning](#versioning).
 
 ### 2. Create the directory structure
 
 ```
-my-portal/
-├── app.py                     # the 5 lines above
-├── config.yaml       # branding, contact, deployment settings
+my-portal/                     # repo root
+├── my-portal/                 # the portal package. Must have a parent directory that holds all of the portal-specific code.
+│   ├── app.py                 # entry point, the 5 lines above
+│   ├── engine.py              # your PortalEngine subclass
+│   ├── config.yaml            # branding, contact, deployment settings
+│   ├── assets/                # your CSS/JS, and any other portal artifacts served alongside base's
+│   ├── callbacks/             # every module defining register_callbacks(app)
+│       ├── general_metadata_callbacks.py # replace with your callback file(s)
+│       └── save_callbacks.py      # not necessary, but each portal will have to write its own save callbacks
+│   ├── layouts/               # one <tab_id>_tab.py per metadata tab
+│        └── general_metadata_tab.py # replace with your tabs_tab.py file(s)
+│   ├── models/                # your SQLAlchemy tables
+│       └── my_portal.py       # replace with your_model.py
+│   ├── seed/                  # reference data loaders (if any - not necessary)
+│   ├── tests/                 # pydantic schema tests (if any - not necessary)
+│   └── utils/                 # your own helpers
 ├── requirements.txt
 ├── Procfile
-├── engine.py                  # your PortalEngine subclass
-├── assets/                    # your CSS/JS, served alongside base's
-├── models/                    # your SQLAlchemy tables
-│   └── my_portal.py           # replace with your_model.py
-├── layouts/                   # one <tab_id>_tab.py per metadata tab
-│   └── general_metadata_tab.py # replace with your tabs_tab.py file(s)
-├── callbacks/                 # every module defining register_callbacks(app)
-│   ├── general_metadata_callbacks.py # replace with your callback file(s)
-│   └── save_callbacks.py      # not necessary, but each portal will have to write its own save callbacks
-└── utils/                     # your own helpers
+├── README.md
+├── CHANGELOG.md
+└── .gitignore
 ```
 
 `example/` in the base repo is a working minimal portal. Copy it's structure.
@@ -118,12 +124,12 @@ Under the **Settings -> Environment Variables**, add everything the app reads vi
 | Variable | Set by | Notes |
 |---|---|---|
 | `DATABASE_URL` | Dash Enterprise | Created when you enable Postgres |
-| `REDIS_URL | Dash Enterprise | Created when you enable Redis |
-| `UPLOAD_DIRECTORY | You | Path under the persistent mount |
-| `ARCHIVE_DIRECTORY | You | Path under the persistent mount |
-| `BAG_DIRECTORY | You | Path under the persistent mount |
+| `REDIS_URL` | Dash Enterprise | Created when you enable Redis |
+| `UPLOAD_DIRECTORY` | You | Path under the persistent mount |
+| `ARCHIVE_DIRECTORY` | You | Path under the persistent mount |
+| `BAG_DIRECTORY` | You | Path under the persistent mount |
 | `TAR_DIRECTORY` | You | Path under the persistent mount |
-| `NCEI_<keys> | You | **TODO** Will need to be implemented when this submission feature is implemented (see sftp folder) |
+| `NCEI_<keys>` | You | **TODO** Will need to be implemented when this submission feature is implemented (see sftp folder) |
 
 Never commit these values. Keys, passwords, paths should be saved as environment variables.
 
