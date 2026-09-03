@@ -541,6 +541,15 @@ worker-beat: celery -A portal_core.app_factory:celery_app beat
 
 Do **not** add `--preload` without reading the note in `portal_core/constants.py` — the database connection pool is created at import, and preloading would share connections across forked workers.
 
+### Two remotes
+
+This repo pushes to two unrelated places:
+
+```bash
+git push origin main     # GitHub -- source of truth, code review
+git push plotly main     # Dash Enterprise -- what actually deploys
+```
+
 ---
 
 ## Versioning
