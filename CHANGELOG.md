@@ -6,6 +6,27 @@ Versions follow the contract rule: **major** means a hook changed or was removed
 and portals must migrate; **minor** means a new hook with a working default, so
 existing portals are unaffected; **patch** means a bug fix with no contract change.
 
+## v0.1.3 - 2026-09-03
+
+### Changed
+- Updated `README.md` with `Two Remotes` section
+
+### Fixed
+- `README.md` installation instructions, directory structure, and absent tick marks.
+
+## v0.1.2 - 2026-08-31
+
+### Fixed
+- Circular import in in `portal_core.submission_db_utils.py` by removing the import in 
+`portal_core.constants` from `portal_core.utils` and installing `logger` directly.
+
+## v0.1.1 - 2026-08-31
+
+### Fixed
+- Circular import in `portal-core/utils/clone_submission.py`, which imported
+from the `portal_core.utils` package while that package's `__init__.py` was 
+still executing. Now imports the sibling modules directly.
+
 ## v0.1.0 - 2026-08-26
 
 First release as a standard packaged. Everything before this lived in the 
@@ -42,16 +63,3 @@ system. `wtforms` and `wtforms-alchemy` are no longer dependencies.
 after splitting out of the original `arctic-data-submit` repo is the real test.
 - Base has no automated tests. `example/` is the only regression check. Will
 add this after split.
-
-## v0.1.1 - 2026-08-31
-
-### Fixed
-- Circular import in `portal-core/utils/clone_submission.py`, which imported
-from the `portal_core.utils` package while that package's `__init__.py` was 
-still executing. Now imports the sibling modules directly.
-
-## v0.1.2 - 2026-08-31
-
-### Fixed
-- Circular import in in `portal_core.submission_db_utils.py` by removing the import in 
-`portal_core.constants` from `portal_core.utils` and installing `logger` directly.
