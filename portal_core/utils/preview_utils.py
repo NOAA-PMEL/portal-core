@@ -133,7 +133,11 @@ def make_preview(file):
             figure.update_yaxes(autorange='reversed')
             cards.append(ddk.Graph(figure=figure))
             return cards
-        elif 'timeseries' in dsg_type.lower() or 'trajectory' in dsg_type.lower():
+        elif (
+            'timeseries' in dsg_type.lower()
+            or 'trajectory' in dsg_type.lower()
+            or dsg_type.strip().lower() == 'station'
+        ):
             vertical = []
             times = []
             time_name = None
