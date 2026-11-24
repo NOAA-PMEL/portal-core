@@ -169,6 +169,7 @@ def create_metadata_modal(portal):
                     ),
 
                     dcc.Store(id='metadata-save-store'),
+                    dcc.Store(id='metadata-ready-store'),
 
                     # Footer
                     html.Div(

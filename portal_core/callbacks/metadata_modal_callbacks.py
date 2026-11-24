@@ -11,16 +11,15 @@ def register_metadata_modal_callbacks(app):
             Input('btn-open-metadata-modal', 'n_clicks'),
             Input('btn-close-metadata-modal', 'n_clicks'),
             Input('btn-cancel-metadata-modal', 'n_clicks'),
-            Input('open-metadata-store', 'data'),
+            Input('metadata-ready-store', 'data'),
         ],
         prevent_initial_call=True
     )
-    def toggle_metadata_modal(open_clicks, close_clicks, cancel_clicks, open_metadata_store):
-        
-        if ctx.triggered_id == 'open-metadata-store' and open_metadata_store is None:
+    def toggle_metadata_modal(open_clicks, close_clicks, cancel_clicks, metadata_ready):
+        if ctx.triggered_id == 'metadata-ready-store' and metadata_ready is None:
             raise PreventUpdate
-        if ctx.triggered_id in ('btn-open-metadata-modal', 'open-metadata-store'):
-            visible =  {
+        if ctx.triggered_id in ('btn-open-metadata-modal', 'metadata-ready-store'):
+            visible = {
                 'display': 'flex',
                 'position': 'fixed',
                 'top': 0, 'left': 0, 'right': 0, 'bottom': 0,
