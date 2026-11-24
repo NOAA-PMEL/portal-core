@@ -326,7 +326,7 @@ def register_wizard_callbacks(app):
             overlay_hidden,
             0, 
             df_submissions.to_dict("records"),
-            constants.VISIBLE_BLOCK,
+            VISIBLE_BLOCK,
             None, # reset current submission to 0 for next time,
             success_notification
         ]
